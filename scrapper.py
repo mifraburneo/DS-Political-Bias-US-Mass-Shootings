@@ -124,21 +124,22 @@ def scrape_source(url: str) -> Source:
 
     try:
         raw_html = simple_get(url)
-    except HTTPError as e:
-        raise print(f'The page "{url}" did not contain valid content.')
-    bs = BeautifulSoup(raw_html, 'html.parser')
+        bs = BeautifulSoup(raw_html, 'html.parser')
+    except:
+        print(f'The page "{url}" did not contain valid content.')
+        pass
 
     if biaser == 'mediabiasfactcheck.com':
         try:
             source_name = bs.find('h1', attrs={'class', 'entry-title page-title'}).text.replace('\n', '').replace('\t', '')
-            if "." in source_name:
-                site_url = source_name
-                source_name = source_name.split('.')[0]
-            else:
-                site_url = "N/A"
         except:
             print(f'The page "{url}" does not have a name')
             source_name = "N/A"
+            site_url = "N/A"
+            pass
+        try:
+            site_url = bs.find('p', attrs={'class':'post-modified-info'}).find_previous('a').text
+        except:
             site_url = "N/A"
             pass
 
@@ -213,33 +214,37 @@ def scrape_source(url: str) -> Source:
             site_url = "N/A"
             pass
 
+    else: site_url = "N/A"; source_name = "N/A"; image_url = "N/A"; 
+
     try:
-        country = rich_data['Country'].capitalize()
+        # if there's text between parentheses in country, remove it
+        rich_data['Country'] = rich_data['Country'].split(' (')[0]
+        country = rich_data['Country'].strip().capitalize()
     except:
         country = "N/A"
     try:
-        bias = rich_data['Bias Rating'].capitalize()
-        if rich_data['Bias Rating'] == 'Least': rich_data['Bias Rating'] = 'Center'
+        bias = rich_data['Bias Rating'].strip().capitalize()
+        if 'Least' in bias: bias = 'Center'
     except:
         bias = "N/A"
     try:
-        factual = rich_data['Factual Reporting'].capitalize()
+        factual = rich_data['Factual Reporting'].strip().capitalize().replace('\xa0', ' ').replace('-', ' ')
     except:
         factual = "N/A"
     try:
-        press_freedom = rich_data['Press Freedom Rating'].capitalize()
+        press_freedom = rich_data['Press Freedom Rating'].strip().capitalize()
     except:
         press_freedom = "N/A"
     try:
-        media_type = rich_data['Media Type'].capitalize()
+        media_type = rich_data['Media Type'].strip().capitalize()
     except:
         media_type = "N/A"
     try:
-        popularity = rich_data['Traffic/Popularity'].capitalize().split(' ')[0]
+        popularity = rich_data['Traffic/Popularity'].strip().split('\xa0')[0].split(' ')[0].capitalize()
     except:
         popularity = "N/A"
     try:
-        MBFC_credibility = rich_data['MBFC Credibility Rating'].capitalize().split(' ')[0]
+        MBFC_credibility = rich_data['MBFC Credibility Rating'].strip().split('\xa0')[0].split(' ')[0].capitalize()
     except:
         MBFC_credibility = "N/A"
 
