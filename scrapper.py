@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # coding: utf-8
 
 # In[ ]:
@@ -139,6 +139,7 @@ def scrape_source(url: str) -> Source:
             pass
         try:
             site_url = bs.find('p', attrs={'class':'post-modified-info'}).find_previous('a').text
+            site_url = site_url.strip()
         except:
             site_url = "N/A"
             pass
