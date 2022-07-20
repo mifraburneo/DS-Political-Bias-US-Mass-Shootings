@@ -279,5 +279,5 @@ data = scrape_sources(fullPagesList)
 
 
 data = pd.DataFrame(data)
-data.to_csv('FullData.csv')
+data.to_csv('FullData.csv', index=False)
 
